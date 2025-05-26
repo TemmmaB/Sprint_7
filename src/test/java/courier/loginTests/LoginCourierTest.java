@@ -1,6 +1,7 @@
 package courier.loginTests;
 import io.qameta.allure.Description;
 import base.LoginCourierTestBase;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import models.courier.CourierLoginResponse;
 import org.apache.http.HttpStatus;
@@ -15,8 +16,22 @@ public class LoginCourierTest extends LoginCourierTestBase {
     @DisplayName("Проверка логина курьера")
     @Description("Позитивная проверка возможности курьера залогиниться")
     public void courierCanLoginSuccessfullyTest() {
-        Response courierLoginResponse = this.client.login(courierLogin);
-        assertEquals("Неверный статус-код", HttpStatus.SC_OK, courierLoginResponse.statusCode());
-        assertNotEquals("ID не должен быть 0", 0, courierLoginResponse.as(CourierLoginResponse.class).getId());
+        Response courierLoginResponse = performLogin();
+        verifyResponseStatus(courierLoginResponse);
+        verifyCourierId(courierLoginResponse);
+    }
+    @Step("Выполнение логина курьера")
+    private Response performLogin() {
+        return this.client.login(courierLogin);
+    }
+
+    @Step("Проверка статуса ответа")
+    private void verifyResponseStatus(Response response) {
+        assertEquals("Неверный статус-код", HttpStatus.SC_OK, response.statusCode());
+    }
+
+    @Step("Проверка, что ID курьера не равен 0")
+    private void verifyCourierId(Response response) {
+        assertNotEquals("ID не должен быть 0", 0, response.as(CourierLoginResponse.class).getId());
     }
 }

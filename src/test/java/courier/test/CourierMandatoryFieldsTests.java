@@ -1,8 +1,9 @@
-package courier.Test;
+package courier.test;
 
 import clients.CourierClient;
 import constants.UserData;
 import io.qameta.allure.Description;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import models.courier.CourierRequest;
 import org.apache.http.HttpStatus;
@@ -43,10 +44,23 @@ public class CourierMandatoryFieldsTests {
     @DisplayName("Проверка создания курьера без обязательных полей")
     @Description("Проверка невозможности создания курьера без обязательных полей")
     public void allFieldsShouldBeFilledInToCreateCourierTest() {
-        CourierRequest courier = new CourierRequest(this.login, this.password, this.firstName);
-        CourierClient client = new CourierClient();
+        CourierRequest courier = createCourierRequest();
+        Response courierResponse = performCourierCreation(courier);
+        verifyResponseStatus(courierResponse);
+    }
+    @Step("Создание запроса на создание курьера с логином: {0}, паролем: {1} и именем: {2}")
+    private CourierRequest createCourierRequest() {
+        return new CourierRequest(this.login, this.password, this.firstName);
+    }
 
-        Response courierResponse = client.create(courier);
-        assertEquals("Неверный статус-код", this.expectedStatusCode, courierResponse.statusCode());
+    @Step("Выполнение запроса на создание курьера")
+    private Response performCourierCreation(CourierRequest courier) {
+        CourierClient client = new CourierClient();
+        return client.create(courier);
+    }
+
+    @Step("Проверка статуса ответа")
+    private void verifyResponseStatus(Response response) {
+        assertEquals("Неверный статус-код", this.expectedStatusCode, response.statusCode());
     }
 }

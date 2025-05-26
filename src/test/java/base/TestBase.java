@@ -32,7 +32,12 @@ public class TestBase {
         } catch (Exception e) {
             System.out.println("Не удалось получить идентификатор курьера: " + e);
         } finally {
-            this.client.delete(this.courierId);
+            // проверяем найден ли идентфикатор курьера перед удалением
+            if (this.courierId != 0){
+                this.client.delete(this.courierId);
+            } else {
+                System.out.println("Идентификатор курьера не найден, удаление не выполнено.");
+            }
         }
     }
 

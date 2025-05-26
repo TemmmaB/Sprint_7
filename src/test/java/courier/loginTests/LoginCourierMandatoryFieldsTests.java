@@ -3,6 +3,7 @@ package courier.loginTests;
 import base.LoginCourierTestBase;
 import constants.UserData;
 import io.qameta.allure.Description;
+import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import models.courier.CourierLoginRequest;
@@ -41,8 +42,22 @@ public class LoginCourierMandatoryFieldsTests extends LoginCourierTestBase {
     @DisplayName("Проверка создания логина курьера без обязательных полей")
     @Description("Проверка невозможности логина курьера без обязательных полей")
     public void allFieldsShouldBeFilledInToLoginCourierTest() {
-        CourierLoginRequest courierLoginInvalid = new CourierLoginRequest(this.login, this.password);
-        Response courierLoginResponse = this.client.login(courierLoginInvalid);
-        assertEquals("Неверный статус-код", this.expectedStatusCode, courierLoginResponse.statusCode());
+        CourierLoginRequest courierLoginInvalid = createCourierLoginRequest();
+        Response courierLoginResponse = performLogin(courierLoginInvalid);
+        verifyResponseStatus(courierLoginResponse);
+    }
+    @Step("Создание запроса на логин курьера с логином: {0} и паролем: {1}")
+    private CourierLoginRequest createCourierLoginRequest() {
+        return new CourierLoginRequest(this.login, this.password);
+    }
+
+    @Step("Выполнение логина курьера")
+    private Response performLogin(CourierLoginRequest courierLoginRequest) {
+        return this.client.login(courierLoginRequest);
+    }
+
+    @Step("Проверка статуса ответа")
+    private void verifyResponseStatus(Response response) {
+        assertEquals("Неверный статус-код", this.expectedStatusCode, response.statusCode());
     }
 }
